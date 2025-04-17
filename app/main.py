@@ -103,7 +103,8 @@ def list_complaints(
                 text=c.text,
                 status=c.status,
                 sentiment=c.sentiment,
-                category=c.category
+                category=c.category,
+                timestamp=c.timestamp
             ) for c in complaints
         ]
     except Exception:
@@ -140,8 +141,7 @@ def update_complaint_status(
             id=complaint.id,
             status=complaint.status,
             sentiment=complaint.sentiment,
-            category=complaint.category,
-            timestamp=complaint.timestamp
+            category=complaint.category
         )
     except Exception:
         logger.exception("Failed to update complaint status")
