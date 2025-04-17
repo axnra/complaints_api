@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Literal, Optional
-
+from datetime import datetime
 
 StatusType = Literal["open", "closed"]
 SentimentType = Literal["positive", "negative", "neutral", "unknown"]
