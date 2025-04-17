@@ -10,7 +10,7 @@ class Settings:
     SENTIMENT_API_KEY = os.getenv("SENTIMENT_API_KEY")
     SENTIMENT_API_URL = "https://api.apilayer.com/sentiment/analysis"
 
-    APILAYER_SPAM_API_KEY = os.getenv("APILAYYER_SPAMCHECK_API_KEY")
+    APILAYER_SPAM_API_KEY = os.getenv("APILAYER_SPAMCHECK_API_KEY")
     APILAYER_SPAM_API_URL = "https://api.apilayer.com/spamchecker"
 
     NINJA_SPAM_API_KEY = os.getenv("NINJA_SPAMCHECK_API_KEY")
