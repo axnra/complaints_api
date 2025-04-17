@@ -1,0 +1,4 @@
+/db.sqlite3
+/.env
+/logs/app.log
+/.idea/.gitignore

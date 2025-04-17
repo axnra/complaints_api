@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  complaints-api:
+    build: .
+    container_name: complaints-api
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./db.sqlite3:/app/db.sqlite3
+    ports:
+      - "8015:8000"
+    networks:
+      - internal
+
+  n8n:
+    image: n8nio/n8n
+    container_name: n8n
+    restart: always
+    ports:
+      - "8020:5678"
+    env_file:
+      - .env
+    environment:
+      - GENERIC_TIMEZONE=Europe/Moscow
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - internal
+    depends_on:
+      - complaints-api
+
+volumes:
+  n8n_data:
+
+networks:
+  internal:
+    driver: bridge
