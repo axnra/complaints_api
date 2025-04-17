@@ -33,6 +33,7 @@ class ComplaintDetailResponse(BaseModel):
     sentiment: SentimentType
     category: CategoryType
     text: str
+    timestamp: datetime
 
 
 class SentimentResult(BaseModel):

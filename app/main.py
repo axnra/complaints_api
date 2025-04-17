@@ -140,7 +140,8 @@ def update_complaint_status(
             id=complaint.id,
             status=complaint.status,
             sentiment=complaint.sentiment,
-            category=complaint.category
+            category=complaint.category,
+            timestamp=complaint.timestamp
         )
     except Exception:
         logger.exception("Failed to update complaint status")
