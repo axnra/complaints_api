@@ -1,99 +1,139 @@
-# Complaint Processing API
+# complaints_api
 
-A RESTful API for collecting and analyzing customer complaints using external services:
-sentiment analysis, spam filtering, geolocation, and category classification.
+A FastAPI-based backend for collecting, analyzing, and categorizing customer complaints.  
+Includes sentiment analysis, category detection using OpenAI, optional spam filtering, and automation via n8n.
 
----
+## Features
 
-## 📦 Features
+- Accepts user complaints via API
+- Analyzes sentiment using [APILayer Sentiment Analysis](https://apilayer.com/marketplace/sentiment-api)
+- Detects category (technical / payment / other) using OpenAI GPT-3.5
+- Optional spam filtering via API Layer or API Ninjas (API keys required; enable manually in code)
+- Stores complaints in SQLite
+- Exposes REST API with OpenAPI docs
+- Integrated automation via n8n
 
-- Accept complaints via POST requests (`/complaints`)
-- Analyze sentiment using [APILayer Sentiment API](https://apilayer.com/marketplace/sentiment-analysis-api)
-- Detect spam via [APILayer](https://apilayer.com/marketplace/spam-checker-api) or [API Ninjas](https://api-ninjas.com/api/spamcheck)
-- Retrieve geolocation via [ip-api](http://ip-api.com/)
-- Classify complaint categories using [OpenAI GPT-3.5 Turbo](https://platform.openai.com/docs/guides/gpt)
+## Technologies
 
----
+- **FastAPI**
+- **SQLite**
+- **Docker & Docker Compose**
+- **n8n** (automation via web interface)
+- **External APIs:**
+  - [APILayer Sentiment API](https://apilayer.com/marketplace/sentiment-api)
+  - [OpenAI GPT-3.5 Turbo](https://platform.openai.com/)
+  - [IP-API](http://ip-api.com/)
+  - [API Layer Spam Checker](https://apilayer.com/marketplace/spamcheck-api)
+  - [API Ninjas Spam Checker](https://api-ninjas.com/api/spamcheck)
 
-## 🚀 Getting Started with Docker
+## Installation
 
 ### 1. Clone the repository
 
 ```bash
 git clone https://github.com/axnra/complaints_api.git
-cd complaints-api
+cd complaints_api
 ```
 
-### 2. Create environment config
+### 2. Create `.env`
+
+Create a file named `.env` in the root directory and fill in your API keys:
+
+```
+DATABASE_URL=sqlite:///./db_data/db.sqlite3
+
+OPENAI_API_KEY=your_openai_key
+SENTIMENT_API_KEY=your_apilayer_sentiment_key
+
+APILAYYER_SPAMCHECK_API_KEY=optional_apilayer_spam_key
+NINJA_SPAMCHECK_API_KEY=optional_ninja_spam_key
+```
+
+> ⚠️ `TELEGRAM_BOT_TOKEN` and Google Service Account credentials **cannot** be passed through `.env` unless you're on **n8n Enterprise**. Set them manually in the n8n web interface.
+
+### 3. Build and start the system
 
 ```bash
-cp .env.example .env
+docker compose up --build -d
 ```
 
-Fill in required keys in `.env`.
+- FastAPI will be available at: http://localhost:8015/docs
+- n8n will be available at: http://localhost:8020
 
-### 3. Build and run
+## API Endpoints
 
-```bash
-docker compose up --build
+### Submit a complaint
+
+```http
+POST /complaints
 ```
 
-The API will be available at: `http://localhost:8000`
-
----
-
-## 🔧 Endpoints
-
-### `POST /complaints`
-
-Submit a new complaint:
-
+**Request Body:**
 ```json
 {
-  "text": "Не приходит SMS-код"
+  "text": "My payment failed again!"
 }
 ```
 
-Response:
-
+**Response:**
 ```json
 {
   "id": 1,
   "status": "open",
-  "sentiment": "neutral",
-  "category": "техническая"
+  "sentiment": "negative",
+  "category": "оплата"
 }
 ```
 
-### `GET /complaints`
+### Get complaints (with filters)
 
-Optional query parameters:
-
-- `status=open|closed`
-- `since=<ISO-8601 datetime>`
-
----
-
-## 🛠️ Environment Variables
-
-See `.env.example` for required variables:
-
-```dotenv
-DATABASE_URL=sqlite:///./db.sqlite3
-SENTIMENT_API_KEY=your_apilayer_key
-APILAYER_SPAMCHECK_API_KEY=your_apilayer_key
-NINJA_SPAMCHECK_API_KEY=your_ninja_key
-OPENAI_API_KEY=your_openai_key
+```http
+GET /complaints?status=open&since=2025-04-17T12:00:00
 ```
 
+### Update status
 
-## 📎 Notes
+```http
+PATCH /complaints/{id}/status?new_status=closed
+```
 
-- If external APIs are unavailable, sentiment is set to `"unknown"`
-- If category cannot be determined, it defaults to `"другое"`
+## Example via `curl`
 
----
+```bash
+curl -X POST http://localhost:8015/complaints      -H "Content-Type: application/json"      -d '{"text": "The SMS never arrived"}'
+```
 
-## 📄 License
+## Database Schema (SQLite)
+
+| Field     | Type    | Description                        |
+|-----------|---------|------------------------------------|
+| id        | int     | Auto-increment primary key         |
+| text      | string  | Complaint text                     |
+| status    | string  | "open" or "closed" (default: open) |
+| timestamp | datetime| UTC time of creation               |
+| sentiment | string  | positive / negative / neutral      |
+| category  | string  | техническая / оплата / другое      |
+
+## Automation with n8n
+
+Automation is implemented via **n8n’s web interface** (GUI workflow builder).
+
+
+### Notes:
+
+- **Authorization to Google Sheets** requires manual login via OAuth2 in n8n GUI
+- **Telegram bot token** must be set in the interface (not `.env`) unless using n8n Enterprise
+
+## Limitations
+
+- Free-tier APIs have daily/monthly limits (see respective providers)
+- n8n cloud environment variable injection is limited without Enterprise license
+- Google Sheets integration requires manual OAuth via browser
+
+## License
 
 MIT
+
+## Author
+
+Built with spite and love by [axnra](https://github.com/axnra)

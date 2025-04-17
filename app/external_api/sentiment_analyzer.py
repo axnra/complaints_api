@@ -61,6 +61,10 @@ class SentimentAnalyzer:
                     headers=headers,
                     json=payload
                 )
+                if response.status_code >= 500:
+                    logger.error(f"APILayer server error: {response.text}")
+                    return SentimentResult(sentiment="unknown")
+
                 response.raise_for_status()
                 data = response.json()
                 sentiment = data.get("sentiment", "unknown")
