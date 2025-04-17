@@ -25,7 +25,9 @@ def get_sentiment_analyzer() -> SentimentAnalyzer:
     )
 
 
-def get_spam_checker() -> SpamChecker:
+def get_spam_checker() -> SpamChecker | None:
+    if not settings.APILAYER_SPAM_API_KEY:
+        return None
     return SpamChecker(
         api_key=settings.APILAYER_SPAM_API_KEY,
         api_url=settings.APILAYER_SPAM_API_URL

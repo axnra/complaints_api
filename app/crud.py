@@ -18,7 +18,7 @@ async def create_complaint(
     complaint: ComplaintCreate,
     client_ip: str,
     sentiment_analyzer: SentimentAnalyzer,
-    spam_checker: SpamChecker,
+    spam_checker: SpamChecker | None,
     geo_locator: GeoLocator,
     category_classifier: CategoryClassifier
 ) -> Complaint:
@@ -61,19 +61,19 @@ async def create_complaint(
     logger.debug(f"Sentiment: {sentiment.sentiment}")
 
     # Spam detection
-    try:
-        spam_result = await spam_checker.check(complaint.text, threshold=Settings.SPAM_THRESHOLD)
-    except Exception as e:
-        logger.warning(f"Spam check failed: {e}")
-        spam_result = SpamCheckResult(is_spam=False, spam_score=0.0)
-    logger.debug(f"Spam score: {spam_result.spam_score}, Is spam: {spam_result.is_spam}")
-
-    # Geolocation (optional)
-    try:
-        geo_result = await geo_locator.locate(client_ip)
-        logger.debug(f"Geo result for IP {client_ip}: {geo_result}")
-    except Exception as e:
-        logger.warning(f"Geolocation failed: {e}")
+    # try:
+    #     spam_result = await spam_checker.check(complaint.text, threshold=Settings.SPAM_THRESHOLD)
+    # except Exception as e:
+    #     logger.warning(f"Spam check failed: {e}")
+    #     spam_result = SpamCheckResult(is_spam=False, spam_score=0.0)
+    # logger.debug(f"Spam score: {spam_result.spam_score}, Is spam: {spam_result.is_spam}")
+    #
+    # # Geolocation (optional)
+    # try:
+    #     geo_result = await geo_locator.locate(client_ip)
+    #     logger.debug(f"Geo result for IP {client_ip}: {geo_result}")
+    # except Exception as e:
+    #     logger.warning(f"Geolocation failed: {e}")
 
     # Initial complaint creation
     db_complaint = Complaint(
