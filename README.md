@@ -1,13 +1,13 @@
 # complaints_api
 
 A FastAPI-based backend for collecting, analyzing, and categorizing customer complaints.  
-Includes sentiment analysis, category detection using OpenAI, optional spam filtering, and automation via n8n.
+Includes sentiment analysis, category detection using OpenRouter, optional spam filtering, and automation via n8n.
 
 ## Features
 
 - Accepts user complaints via API
 - Analyzes sentiment using [APILayer Sentiment Analysis](https://apilayer.com/marketplace/sentiment-api)
-- Detects category (technical / payment / other) using OpenAI GPT-3.5
+- Detects category (technical / payment / other) using **OpenRouter GPT-4.1 Nano** (faster & cheaper than GPT-3.5)
 - Optional spam filtering via API Layer or API Ninjas (API keys required; enable manually in code)
 - Stores complaints in SQLite
 - Exposes REST API with OpenAPI docs
@@ -21,10 +21,12 @@ Includes sentiment analysis, category detection using OpenAI, optional spam filt
 - **n8n** (automation via web interface)
 - **External APIs:**
   - [APILayer Sentiment API](https://apilayer.com/marketplace/sentiment-api)
-  - [OpenAI GPT-3.5 Turbo](https://platform.openai.com/)
+  - [OpenRouter GPT-4.1 Nano](https://openrouter.ai/openai/gpt-4.1-nano/api)
   - [IP-API](http://ip-api.com/)
   - [API Layer Spam Checker](https://apilayer.com/marketplace/spamcheck-api)
   - [API Ninjas Spam Checker](https://api-ninjas.com/api/spamcheck)
+
+> ✅ GPT-3.5 Turbo support is still available. To use it, manually update the `CategoryClassifier` implementation in the code.
 
 ## Installation
 
@@ -42,12 +44,19 @@ Create a file named `.env` in the root directory and fill in your API keys:
 ```
 DATABASE_URL=sqlite:///./db_data/db.sqlite3
 
-OPENAI_API_KEY=your_openai_key
+# Category classification (OpenRouter GPT-4.1 Nano)
+OPENROUTER_API_KEY=your_openrouter_key
+PROXY=optional_http_proxy_url  # e.g. http://user:pass@host:port
+
+# Sentiment analysis
 SENTIMENT_API_KEY=your_apilayer_sentiment_key
 
+# Optional spam filtering
 APILAYYER_SPAMCHECK_API_KEY=optional_apilayer_spam_key
 NINJA_SPAMCHECK_API_KEY=optional_ninja_spam_key
 ```
+
+> ⚠️ If you're running in a country where `openrouter.ai` is blocked, set up a HTTP proxy using the `PROXY` variable.
 
 > ⚠️ `TELEGRAM_BOT_TOKEN` and Google Service Account credentials **cannot** be passed through `.env` unless you're on **n8n Enterprise**. Set them manually in the n8n web interface.
 
@@ -57,7 +66,7 @@ NINJA_SPAMCHECK_API_KEY=optional_ninja_spam_key
 docker compose up --build -d
 ```
 
-- FastAPI will be available at: http://localhost:8015/docs
+- FastAPI will be available at: http://localhost:8015/docs  
 - n8n will be available at: http://localhost:8020
 
 ## API Endpoints
@@ -100,7 +109,9 @@ PATCH /complaints/{id}/status?new_status=closed
 ## Example via `curl`
 
 ```bash
-curl -X POST http://localhost:8015/complaints      -H "Content-Type: application/json"      -d '{"text": "The SMS never arrived"}'
+curl -X POST http://localhost:8015/complaints \
+     -H "Content-Type: application/json" \
+     -d '{"text": "The SMS never arrived"}'
 ```
 
 ## Database Schema (SQLite)
@@ -117,7 +128,6 @@ curl -X POST http://localhost:8015/complaints      -H "Content-Type: application
 ## Automation with n8n
 
 Automation is implemented via **n8n’s web interface** (GUI workflow builder).
-
 
 ### Notes:
 

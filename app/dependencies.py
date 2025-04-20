@@ -5,8 +5,8 @@ from app.config import Settings
 from app.external_api.sentiment_analyzer import SentimentAnalyzer
 from app.external_api.spam_checker_apilayer import SpamChecker
 from app.external_api.geo_locator import GeoLocator
-from app.external_api.category_classifier import CategoryClassifier
-
+# from app.external_api.category_classifier import CategoryClassifier
+from app.external_api.category_classifier_gpt4_1_nano import CategoryClassifier
 settings = Settings()
 
 
@@ -40,10 +40,19 @@ def get_geo_locator() -> GeoLocator:
     )
 
 
+# def get_category_classifier() -> CategoryClassifier | None:
+#     if not settings.OPENAI_API_KEY:
+#         return None
+#     return CategoryClassifier(
+#         api_key=settings.OPENAI_API_KEY,
+#         api_url=settings.OPENAI_API_URL
+#     )
+
 def get_category_classifier() -> CategoryClassifier | None:
-    if not settings.OPENAI_API_KEY:
+    if not settings.OPENROUTER_API_KEY:
         return None
     return CategoryClassifier(
-        api_key=settings.OPENAI_API_KEY,
-        api_url=settings.OPENAI_API_URL
+        api_key=settings.OPENROUTER_API_KEY,
+        api_url=settings.OPENROUTER_API_URL,
+        proxy=settings.PROXY
     )

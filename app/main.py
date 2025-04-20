@@ -16,7 +16,8 @@ from app.schemas import ComplaintResponse, StatusFilter, ComplaintCreate, Status
 from app.external_api.sentiment_analyzer import SentimentAnalyzer
 from app.external_api.spam_checker_ninja import SpamChecker
 from app.external_api.geo_locator import GeoLocator
-from app.external_api.category_classifier import CategoryClassifier
+# from app.external_api.category_classifier import CategoryClassifier
+from app.external_api.category_classifier_gpt4_1_nano import CategoryClassifier
 from app.utils.request_utils import extract_client_ip
 from app.logger import logger
 

@@ -16,8 +16,13 @@ class Settings:
     NINJA_SPAM_API_KEY = os.getenv("NINJA_SPAMCHECK_API_KEY")
     NINJA_SPAM_API_URL = "https://api.api-ninjas.com/v1/spamcheck"
 
+    SPAM_THRESHOLD = 2.0
+
     GEO_API_URL = "http://ip-api.com/json"
 
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     OPENAI_API_URL = "https://api.openai.com/v1/chat/completions"
-    SPAM_THRESHOLD = 2.0
+    OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+    OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
+
+    PROXY = os.getenv("PROXY")
